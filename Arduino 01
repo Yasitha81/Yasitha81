@@ -1,0 +1,89 @@
+//Libraries of the OLED display
+#include <Adafruit_FeatherOLED.h>
+#include <Adafruit_FeatherOLED_SH110X.h>
+#include <Adafruit_FeatherOLED_SH110X_WiFi.h>
+#include <Adafruit_FeatherOLED_WiFi.h>
+
+int x = 33; //You can change the pin numbers and variable names also for your requirement.
+int y = 26; //You can change the pin numbers and variable names also for your requirement.
+int z = 25; //You can change the pin numbers and variable names also for your requirement.
+int echoPin = 14; // Pin configuration for the ultrasonic sensor. this pin is a output.
+int trigpin = 27; // Pin configuration for the ultrasonic sensor. this pin is a input.
+
+long duration; // here is the variable and their data type.
+int distance; //// here is the variable and their data type.
+
+//other Libraries.
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+//Define the Screen width and height of the OLED.
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void setup() {
+
+//Here define all pins either input or output.
+
+pinMode(echoPin,INPUT);
+pinMode(trigpin,OUTPUT);
+pinMode(x,OUTPUT);
+pinMode(y,OUTPUT);
+pinMode(z,OUTPUT);
+Serial.begin(9600);
+if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+Serial.println(F("SSD1306 allocation failed"));
+for(;;); // Don't proceed, loop forever
+}
+
+display.display();
+delay(20);
+
+display.clearDisplay();
+
+display.display();
+delay(10);
+
+}
+void loop() {
+digitalWrite(trigpin,LOW);
+delayMicroseconds(2);
+
+digitalWrite(trigpin,HIGH);
+delayMicroseconds(10);
+digitalWrite(trigpin,LOW);
+
+duration = pulseIn(echoPin, HIGH);
+distance = duration * 0.0344 / 2;
+if (distance > 100){
+
+digitalWrite(x,HIGH); //red
+digitalWrite(y,LOW); //26
+digitalWrite(z,LOW);
+Serial.print("Distance: ");
+Serial.print(distance); 
+Serial.println(" cm");
+
+display.clearDisplay();
+
+display.setTextSize(1);
+display.setTextColor(WHITE);
+display.setCursor(10, 10);
+// Display static text
+display.print("Distance : = ");
+display.setTextSize(1);
+display.setTextColor(WHITE);
+display.setCursor(90, 10);
+// Display static text
+display.print(distance);
+display.print("cm");
+
+display.display();
+}
+
+delay(10);
